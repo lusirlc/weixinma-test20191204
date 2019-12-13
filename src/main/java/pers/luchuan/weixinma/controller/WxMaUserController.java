@@ -8,6 +8,7 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,23 +22,24 @@ import pers.luchuan.weixinma.utils.JsonUtils;
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @RestController
-@RequestMapping("/wx/user/{appid}")
+@RequestMapping("/wx/user")
 public class WxMaUserController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    private WxMaService wxMaService;
     /**
      * 登陆接口
      */
     @GetMapping("/login")
-    public String login(@PathVariable String appid, String code) {
+    public String login(String code) {
         if (StringUtils.isBlank(code)) {
             return "empty jscode";
         }
 
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         try {
-            WxMaJscode2SessionResult session = wxService.getUserService().getSessionInfo(code);
+            WxMaJscode2SessionResult session = wxMaService.getUserService().getSessionInfo(code);
             this.logger.info(session.getSessionKey());
             this.logger.info(session.getOpenid());
             //TODO 可以增加自己的逻辑，关联业务相关数据
@@ -54,17 +56,16 @@ public class WxMaUserController {
      * </pre>
      */
     @GetMapping("/info")
-    public String info(@PathVariable String appid, String sessionKey,
+    public String info(String sessionKey,
 					   String signature, String rawData, String encryptedData, String iv) {
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         // 用户信息校验
-        if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+        if (!wxMaService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
             return "user check failed";
         }
 
         // 解密用户信息
-        WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
+        WxMaUserInfo userInfo = wxMaService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
 
         return JsonUtils.toJson(userInfo);
     }
@@ -75,17 +76,16 @@ public class WxMaUserController {
      * </pre>
      */
     @GetMapping("/phone")
-    public String phone(@PathVariable String appid, String sessionKey, String signature,
+    public String phone(String sessionKey, String signature,
 						String rawData, String encryptedData, String iv) {
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         // 用户信息校验
-        if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+        if (!wxMaService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
             return "user check failed";
         }
 
         // 解密
-        WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
+        WxMaPhoneNumberInfo phoneNoInfo = wxMaService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
 
         return JsonUtils.toJson(phoneNoInfo);
     }

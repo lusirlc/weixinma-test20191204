@@ -9,22 +9,21 @@ logging:
     cn.binarywang.wx.miniapp: debug
 wx:
   miniapp:
-    configs:
 #        - appid: wxbb6594d9f3c229f8
-        - appid: wxbb6594d9f3c229f8
+        appid: wxbb6594d9f3c229f8
 #          secret: 2af31774e169b9533d7f9f6d62c6e541
-          secret: 2af31774e169b9533d7f9f6d62c6e541
+        secret: 2af31774e169b9533d7f9f6d62c6e541
 #          token: luchuan
-          token: luchuan
+        token: luchuan
 #          aesKey: 2hfOp7B6kzZ04cb3NPC6dZkIlVsSJlQnIclon5oidL2
-          aesKey: 2hfOp7B6kzZ04cb3NPC6dZkIlVsSJlQnIclon5oidL2
-          msgDataFormat: JSON
+        aesKey: 2hfOp7B6kzZ04cb3NPC6dZkIlVsSJlQnIclon5oidL2
+        msgDataFormat: JSON
 spring:
   redis:
     host: localhost
     port: 6379
     database: 0
-    jedis:
-      pool:
-        max-active: 8
+    pool:
+      max-active: 8
+    timeout: 1000
 

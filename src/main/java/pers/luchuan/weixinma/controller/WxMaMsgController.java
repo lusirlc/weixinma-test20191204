@@ -22,28 +22,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/wx/msg")
 public class WxMaMsgController {
-//	@Value("${wx.miniapp.configs.appid}")
-//	private String appid;
+	@Autowired
+	private WxMaService wxMaService;
 	@PostMapping("/sendSubscribeMsg")
-	public void sendSubscribeMsg(String appid) {
-		WxMaService maService = WxMaConfiguration.getMaService(appid);
-		WxMaMsgService msgService = maService.getMsgService();
+	public void sendSubscribeMsg() {
 		WxMaSubscribeData subscribeData1 = new WxMaSubscribeData();
 		subscribeData1.setName("name1");
 		subscribeData1.setValue("小书包");
 		WxMaSubscribeData subscribeData2 = new WxMaSubscribeData();
-		subscribeData1.setName("number2");
-		subscribeData1.setValue("2");
+		subscribeData2.setName("number2");
+		subscribeData2.setValue("2");
 		WxMaSubscribeData subscribeData3 = new WxMaSubscribeData();
-		subscribeData1.setName("date3");
-		subscribeData1.setValue("2019年10月11日 08:20");
+		subscribeData3.setName("date3");
+		subscribeData3.setValue("2019年10月11日 08:20");
 		List<WxMaSubscribeData> data = Arrays.asList(subscribeData1, subscribeData2,subscribeData3);
 		WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage();
 		subscribeMessage.setData(data);
 		subscribeMessage.setPage("1");
 		subscribeMessage.setTemplateId("Yn2r0PHbi1hqJax1op-d05UCbYYjuRnXS73AaEtN2xk");
 		
-		subscribeMessage.setToUser("oyeEW0XE-mJaTgsiTiP6OA3KY1GE");
+		subscribeMessage.setToUser("oVnKv4pUwx7Dr9A4lGqkFQmOtCUI");
+		WxMaMsgService msgService = wxMaService.getMsgService();
 		try {
 			msgService.sendSubscribeMsg(subscribeMessage);
 		} catch (WxErrorException e) {

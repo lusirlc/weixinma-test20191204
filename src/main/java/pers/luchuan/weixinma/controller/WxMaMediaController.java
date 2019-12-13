@@ -8,6 +8,7 @@ import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -29,18 +30,19 @@ import java.util.List;
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @RestController
-@RequestMapping("/wx/media/{appid}")
+@RequestMapping("/wx/media")
 public class WxMaMediaController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    private WxMaService wxMaService;
     /**
      * 上传临时素材
      *
      * @return 素材的media_id列表，实际上如果有的话，只会有一个
      */
     @PostMapping("/upload")
-    public List<String> uploadMedia(@PathVariable String appid, HttpServletRequest request) throws WxErrorException {
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
+    public List<String> uploadMedia(HttpServletRequest request) throws WxErrorException {
 
         CommonsMultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
 
@@ -57,7 +59,7 @@ public class WxMaMediaController {
                 File newFile = new File(Files.createTempDir(), file.getOriginalFilename());
                 this.logger.info("filePath is ：" + newFile.toString());
                 file.transferTo(newFile);
-                WxMediaUploadResult uploadResult = wxService.getMediaService().uploadMedia(WxMaConstants.KefuMsgType.IMAGE, newFile);
+                WxMediaUploadResult uploadResult = wxMaService.getMediaService().uploadMedia(WxMaConstants.KefuMsgType.IMAGE, newFile);
                 this.logger.info("media_id ： " + uploadResult.getMediaId());
                 result.add(uploadResult.getMediaId());
             } catch (IOException e) {
@@ -73,8 +75,7 @@ public class WxMaMediaController {
      */
     @GetMapping("/download/{mediaId}")
     public File getMedia(@PathVariable String appid, @PathVariable String mediaId) throws WxErrorException {
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
-        return wxService.getMediaService().getMedia(mediaId);
+        return wxMaService.getMediaService().getMedia(mediaId);
     }
 }
